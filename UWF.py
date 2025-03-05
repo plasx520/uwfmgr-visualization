@@ -49,9 +49,8 @@ def execute_command(input_cmd, text_output):
         output = f"执行命令时出错: {str(e)}"
   
   
-    # 清空并更新输出文本框
-    text_output.delete(1.0, tk.END)
-    text_output.insert(tk.END, output)
+    # 更新输出文本框
+    text_output.insert(tk.END, output + "\n")
 
 def create_base_config_frame(root, set_text_func):
     """创建基本配置框架，包含按钮。"""
@@ -59,8 +58,11 @@ def create_base_config_frame(root, set_text_func):
     tk.Label(frame, text="基本配置:").pack(side=tk.LEFT)
     buttons = [
         ("查看配置", "uwfmgr Get-Config", "查看配置详情，里面有下一次启动的配置，注意检查哦"),
+        ("查看C盘", "uwfmgr volume get-config C:", "# 查看C盘配置"),
+        ("查看C简单", "uwfmgr volume protect c:", "卷 c: 已受统一写入筛选器保护 - 未执行任何操作。"),        
         ("启用UWF", "uwfmgr filter enable", "启用命令可能需要执行多次，并重启电脑才有效"),
-        ("禁用UWF", "uwfmgr filter disable", "禁用命令可能需要执行多次，并重启电脑才有效")
+        ("禁用UWF", "uwfmgr filter disable", "禁用命令可能需要执行多次，并重启电脑才有效"),
+        ("重置UWF", "uwfmgr filter reset-settings ", "# 清除所有配置（需重启）")
     ]
     for text, cmd, info in buttons:
         create_button(frame, text, cmd, info, set_text_func)
@@ -72,7 +74,8 @@ def create_save_patch_frame(root, set_text_func):
     tk.Label(frame, text="写入过滤:").pack(side=tk.LEFT)
     buttons = [
         ("内存", "uwfmgr overlay Set-Type RAM", "可能在禁用UWF并重启后才可以修改这个参数，保存到内存有助于保护硬盘"),
-        ("硬盘", "uwfmgr overlay Set-Type DISK", "可能在禁用UWF并重启后才可以修改这个参数，保存到硬盘可以配置更大的overlay容量")
+        ("硬盘", "uwfmgr overlay Set-Type DISK", "可能在禁用UWF并重启后才可以修改这个参数，保存到硬盘可以配置更大的overlay容量"),
+        ("占用", "uwfmgr overlay get-consumption", "# 查看当前占用")
     ]
     for text, cmd, info in buttons:
         create_button(frame, text, cmd, info, set_text_func)
@@ -183,7 +186,7 @@ def main():
         frame.grid(row=2 + idx, column=0, columnspan=2, sticky=tk.EW, padx=10, pady=5)
 
     # 执行按钮
-    execute_button = tk.Button(root, text="执行", command=lambda: execute_command(input_cmd, text_output))
+    execute_button = tk.Button(root, text="       执 行       ", command=lambda: execute_command(input_cmd, text_output))
     execute_button.grid(row=len(frames) + 2, column=0, columnspan=2, pady=10)
 
     # 命令输出文本框
@@ -191,7 +194,7 @@ def main():
         root,
         wrap=tk.WORD,
         width=80,
-        height=10,
+        height=5,
         font=('Microsoft YaHei', 10)  # 使用更通用的中文字体
     )
     text_output.grid(row=len(frames) + 3, column=0, columnspan=2, sticky=tk.EW, padx=10, pady=5)
